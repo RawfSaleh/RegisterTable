@@ -3,10 +3,46 @@ import pyglet, os
 from tkinter import ttk, messagebox
 import mysql.connector
 from tkinter import *
-
 import winsound
 from winsound import *
 play=lambda:PlaySound('mixkit-alert-quick-chime-766.wav',SND_FILENAME)
+
+#2nd window
+tkWindow = Tk()
+tkWindow.geometry('800x500')
+tkWindow.title('Log in ')
+
+
+#Email_address label and text entry box
+title=Label(tkWindow,text="Log In",font=('Berlin Sans FB Demi', 25)).pack()
+Email_addressLabel = Label(tkWindow, text="Email address",font=('Times New Roman',10)).place(x=340, y=150)
+Email_address = StringVar()
+Email_addressEntry = Entry(tkWindow,textvariable=Email_address,width=40)
+Email_addressEntry.place(x=380,y=190,anchor=CENTER)
+Email_addressEntry.insert(0, 'Enter email')
+
+
+#password label and password entry box
+passwordLabel = Label(tkWindow,text="Password",font=('Times New Roman',10)).place(x=340,y=220)
+password = StringVar()
+passwordEntry = Entry(tkWindow, textvariable=password,width=40)
+passwordEntry.place(x=380,y=260,anchor=CENTER)
+passwordEntry.insert(0, 'Enter password')
+
+
+def validateSubmit(Email_address, password):
+	print("Email address entered :", Email_address.get())
+	print("password entered :", password.get())
+	return
+# call function when we click on entry box
+def click1(*args):
+    Email_addressEntry.delete(0, 'end')
+
+def click2(*args):
+    passwordEntry.delete(0, 'end')
+
+#submit button
+submitButton = Button(tkWindow, text="Submit",width=20,bg='blue',fg='white',font=('Times New Roman',10), command=validateSubmit).place(x=290,y=300)
 
 def Delete(event):
     e1.delete(0, END)
@@ -118,6 +154,7 @@ def show():
 #design part
 root = Tk()
 root.geometry("800x500")
+root.title('Registration')
 root['bg']='lightpink'
 global e1
 global e2
@@ -140,6 +177,7 @@ e3.place(x=140, y=70)
 
 e4 = Entry(root)
 e4.place(x=140, y=100)
+
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
         for f in funcs:
@@ -147,8 +185,8 @@ def combine_funcs(*funcs):
     return combined_func
 
 Button(root, text="Add", command=combine_funcs(play,Add), height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=30, y=130)
-Button(root, text="update", command=update, height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=140, y=130)
-Button(root, text="Delete", command=delete, height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=250, y=130)
+Button(root, text="Update", command=combine_funcs(play,update), height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=140, y=130)
+Button(root, text="Delete", command=combine_funcs(play,delete), height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=250, y=130)
 
 #هذا لاتحبرشين به ياروف ! انتبهي
 cols = ('id', 'studentname', 'course', 'fee')
