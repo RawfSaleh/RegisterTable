@@ -1,0 +1,233 @@
+import tkinter as tk
+import pyglet, os
+from tkinter import ttk, messagebox
+import mysql.connector
+from tkinter import *
+from functools import partial
+
+def validateLogin(username, password):
+    print("username entered :", username.get())
+    print("password entered :", password.get())
+    return
+def combine_funcs(*funcs):
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+    return combined_func
+
+def Add1():
+    username = A1.get()
+    password = A2.get()
+
+
+    mysqldb = mysql.connector.connect(host="localhost", user="root", password="", database="school")
+    mycursor = mysqldb.cursor()
+
+    try:
+
+        sql = "INSERT INTO sign_in (username,password) VALUES (%s, %s)"
+        val = (username,password)
+        mycursor.execute(sql, val)
+        mysqldb.commit()
+        lastid = mycursor.lastrowid
+        #messagebox.showinfo("Info", "Registration done successfully ")
+        A1.delete(0, END)
+        A2.delete(0, END)
+        e1.focus_set()
+    except Exception as e:
+        print(e)
+        mysqldb.rollback()
+        mysqldb.close()
+
+
+def click1(*args):
+    A1.delete(0, 'end')
+
+
+def click2(*args):
+    A2.delete(0, 'end')
+
+tkWindow = Tk()
+tkWindow.state('zoomed')
+tkWindow.geometry("820x500")
+tkWindow.title('Login Form')
+tkWindow.configure(bg='lightpink')
+
+title = Label(tkWindow, text="Log In", font=('Berlin Sans FB Demi', 40, 'bold'),background='lightpink',fg="deeppink3").place(x=700,y=100)
+usernameLabel = Label(tkWindow, text="Email address", font=('Times New Roman', 20, 'bold'),background='lightpink',fg="deeppink3").place(x=480, y=290)
+username = StringVar()
+A1 = Entry(tkWindow, textvariable=username, width=20,font=('Times New Roman',20))
+A1.place(x=800,y=310,anchor=CENTER)
+
+
+
+
+# password label and password entry box
+passwordLabel = Label(tkWindow, text="Password",font=('Times New Roman', 20, 'bold'),background='lightpink',fg="deeppink3").place(x=480,y=390)
+password = StringVar()
+A2 = Entry(tkWindow, textvariable=password, width=20,font=('Times New Roman',20))
+A2.place(x=800,y=410,anchor=CENTER)
+passworde = Entry(tkWindow, textvariable=password, width=20)
+
+
+
+
+# login button
+loginButton = Button(tkWindow, text="Submit", width=33, bg="mistyrose1", fg='deeppink3',font=('Times New Roman',10),command=combine_funcs(Add1,lambda:tkWindow.destroy())).place(x=680, y=500)
+
+import winsound
+from winsound import *
+play=lambda:PlaySound('mixkit-alert-quick-chime-766.wav',SND_FILENAME)
+
+def Delete(event):
+    e1.delete(0, END)
+    e2.delete(0, END)
+    e3.delete(0, END)
+    e4.delete(0, END)
+    row_id = listBox.selection()[0]
+    select = listBox.set(row_id)
+    e1.insert(0, select['id'])
+    e2.insert(0, select['studentname'])
+    e3.insert(0, select['course'])
+    e4.insert(0, select['fee'])
+
+
+def Add():
+    studid = e1.get()
+    studname = e2.get()
+    coursename = e3.get()
+    feee = e4.get()
+
+    mysqldb = mysql.connector.connect(host="localhost", user="root", password="", database="school")
+    mycursor = mysqldb.cursor()
+
+    try:
+
+        sql = "INSERT INTO record (id,stname,course,fee) VALUES (%s, %s, %s, %s)"
+        val = (studid, studname, coursename, feee)
+        mycursor.execute(sql, val)
+        mysqldb.commit()
+        lastid = mycursor.lastrowid
+        messagebox.showinfo("Info", "Registration done successfully ")
+        e1.delete(0, END)
+        e2.delete(0, END)
+        e3.delete(0, END)
+        e4.delete(0, END)
+        e1.focus_set()
+    except Exception as e:
+        print(e)
+        mysqldb.rollback()
+        mysqldb.close()
+
+
+def update():
+    studid = e1.get()
+    studname = e2.get()
+    coursename = e3.get()
+    feee = e4.get()
+    mysqldb = mysql.connector.connect(host="localhost", user="root", password="", database="school")
+    mycursor = mysqldb.cursor()
+
+    try:
+        sql = "Update  record set stname= %s,course= %s,fee= %s where id= %s"
+        val = (studname, coursename, feee, studid)
+        mycursor.execute(sql, val)
+        mysqldb.commit()
+        lastid = mycursor.lastrowid
+        messagebox.showinfo("Info", "Changed done successfully")
+
+        e1.delete(0, END)
+        e2.delete(0, END)
+        e3.delete(0, END)
+        e4.delete(0, END)
+        e1.focus_set()
+
+    except Exception as e:
+
+         print(e)
+         mysqldb.rollback()
+         mysqldb.close()
+
+def delete():
+    studid = e1.get()
+
+    mysqldb = mysql.connector.connect(host="localhost", user="root", password="", database="school")
+    mycursor = mysqldb.cursor()
+
+    try:
+        sql = "delete from record where id = %s"
+        val = (studid,)
+        mycursor.execute(sql, val)
+        mysqldb.commit()
+        lastid = mycursor.lastrowid
+        messagebox.showinfo("Info", "Deleted done successfully")
+
+        e1.delete(0, END)
+        e2.delete(0, END)
+        e3.delete(0, END)
+        e4.delete(0, END)
+        e1.focus_set()
+
+    except Exception as e:
+
+        print(e)
+        mysqldb.rollback()
+        mysqldb.close()
+
+
+def show():
+    mysqldb = mysql.connector.connect(host="localhost", user="root", password="", database="school")
+    mycursor = mysqldb.cursor()
+    mycursor.execute("SELECT id,stname,course,fee FROM record")
+    records = mycursor.fetchall()
+    print(records)
+
+    for i, (id, stname, course, fee) in enumerate(records, start=1):
+        listBox.insert("", "end", values=(id, stname, course, fee))
+        mysqldb.close()
+
+#design part
+root = Tk()
+root.geometry("820x500")
+root.state('zoomed')
+root['bg']='lightpink'
+global e1
+global e2
+global e3
+global e4
+tk.Label(root, text="Student Registration System ", fg="deeppink3", font=('Berlin Sans FB Demi',40),bg="lightpink").place(x=500,y=100)
+tk.Label(root, text="Student ID",fg="deeppink3",font=('Times New Roman',10),bg="lightpink").place(x=550, y=230)
+Label(root, text="Student Name",fg="deeppink3",font=('Times New Roman',10),bg="lightpink").place(x=550, y=280)
+Label(root, text="Course",fg="deeppink3",font=('Times New Roman',10),bg="lightpink").place(x=550, y=330)
+Label(root, text="Fee",fg="deeppink3",font=('Times New Roman',10),bg="lightpink").place(x=550, y=380)
+
+e1 = Entry(root)
+e1.place(x=640, y=230)
+
+e2 = Entry(root)
+e2.place(x=640, y=280)
+
+e3 = Entry(root)
+e3.place(x=640, y=330)
+
+e4 = Entry(root)
+e4.place(x=640, y=380)
+
+
+Button(root, text="Add", command=combine_funcs(play,Add), height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=520, y=420)
+Button(root, text="Update", command=combine_funcs(play,update), height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=640, y=420)
+Button(root, text="Delete", command=combine_funcs(play,delete), height=3, width=13,font=('Times New Roman',10),bg="mistyrose1",fg="deeppink3").place(x=760, y=420)
+
+#هذا لاتحبرشين به ياروف ! انتبهي
+cols = ('id', 'studentname', 'course', 'fee')
+listBox = ttk.Treeview( root, columns=cols, show='headings')
+
+for col in cols:
+    listBox.heading(col, text=col)
+    listBox.grid(row=1, column=1, columnspan=2)
+    listBox.place(x=500, y=500)
+
+show()
+listBox.bind('<Double-Button-1>',Delete)
+
+root.mainloop()
